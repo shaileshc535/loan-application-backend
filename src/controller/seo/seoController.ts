@@ -1,17 +1,17 @@
 import SEOModal from "../../modal/Seo-Modal";
 import { Response } from "express";
-import mongoose from "mongoose";
 import { StatusCodes } from "http-status-codes";
-const ObjectId = <any>mongoose.Types.ObjectId;
+// import mongoose from "mongoose";
+// const ObjectId = <any>mongoose.Types.ObjectId;
 
 const createSEOTag = async (req, res: Response) => {
   try {
     const user = JSON.parse(JSON.stringify(req.user));
 
-    const base_url = process.env.BASE_URL;
-
-    const seo_icon_url = base_url + "/public/" + req.files.seo_icon[0].filename;
-    const web_icon_url = base_url + "/public/" + req.files.web_icon[0].filename;
+    const seo_icon_url =
+      process.env.BASE_URL + "/public/" + req.files.seo_icon[0].filename;
+    const web_icon_url =
+      process.env.BASE_URL + "/public/" + req.files.web_icon[0].filename;
 
     const newSeoTag = new SEOModal({
       page_name: req.body.page_name,
@@ -43,14 +43,32 @@ const createSEOTag = async (req, res: Response) => {
 const editSeoTag = async (req, res: Response) => {
   try {
     const user = JSON.parse(JSON.stringify(req.user));
+
     const requestData = req.body;
 
-    const result = await SEOModal.findByIdAndUpdate(
+    const seo_icon_url =
+      process.env.BASE_URL + "/public/" + req.files.seo_icon[0].filename;
+    const web_icon_url =
+      process.env.BASE_URL + "/public/" + req.files.web_icon[0].filename;
+
+    const data = {
+      page_name: req.body.page_name,
+      page_url: req.body.page_url,
+      meta_title: req.body.meta_title,
+      meta_description: req.body.meta_description,
+      heading_tags: req.body.heading_tags,
+      seo_icon: seo_icon_url,
+      web_icon: web_icon_url,
+    };
+
+    await SEOModal.findByIdAndUpdate(
       {
         _id: requestData.seoId,
       },
-      requestData
+      data
     );
+
+    const result = await SEOModal.findById({ _id: requestData.seoId });
 
     res.status(200).json({
       status: true,
@@ -73,7 +91,7 @@ const deleteSeoTag = async (req, res: Response) => {
 
     const id = req.body.seoId;
 
-    if (user.role_id != "admin") {
+    if (user.role != "admin") {
       return res.status(404).json({
         status: false,
         type: "success",
@@ -85,7 +103,7 @@ const deleteSeoTag = async (req, res: Response) => {
       isdeleted: true,
     };
 
-    const result = await SEOModal.findByIdAndUpdate(
+    await SEOModal.findByIdAndUpdate(
       {
         _id: id,
       },
@@ -96,7 +114,7 @@ const deleteSeoTag = async (req, res: Response) => {
       status: true,
       type: "success",
       message: "SEO Tag Deleted Successfully.",
-      data: result,
+      data: "",
     });
   } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -112,7 +130,7 @@ const GetSeoTagById = async (req, res: Response) => {
     const user = JSON.parse(JSON.stringify(req.user));
     const id = req.params.seoId;
 
-    const result = await SEOModal.findById({ _id: id });
+    const result = await SEOModal.findById({ _id: id, isdeleted: false });
 
     res.status(200).json({
       status: true,

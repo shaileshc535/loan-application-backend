@@ -1,7 +1,6 @@
 import { Schema, model } from "mongoose";
 
 export interface ISeo {
-  _id: string;
   page_name: string;
   page_url: string;
   meta_title: string;

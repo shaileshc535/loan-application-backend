@@ -34,12 +34,12 @@ router.post(
   controller.createSEOTag
 );
 
-router.post("/edit-seo-tag", auth, controller.editSeoTag);
+router.post("/edit-seo-tag", auth, seoTagMulterUpload, controller.editSeoTag);
 
 router.post("/delete-seo-tag", auth, controller.deleteSeoTag);
 
 router.get("/get-seo-tag/:seoId", auth, controller.GetSeoTagById);
 
-router.get("/get-seo-tag", auth, controller.GetSeoTagList);
+router.post("/get-seo-tag", auth, controller.GetSeoTagList);
 
 export default router;

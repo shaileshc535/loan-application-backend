@@ -1,13 +1,12 @@
 import { Schema, model } from "mongoose";
 
 export interface IApps {
-  _id: string;
   name: string;
   slug: string;
   privacy_policy: string;
-  isdeleted: boolean;
   permission: Array<string>;
   roles: Array<string>;
+  isdeleted: boolean;
 }
 
 const AppSchema = new Schema<IApps>(
