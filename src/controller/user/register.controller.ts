@@ -9,8 +9,6 @@ const register = async (req, res) => {
   try {
     const registerData = req.body;
 
-    console.log("registerData", registerData);
-
     if (!registerData.email) {
       logger.error("Please enter a your email");
       throw new Error("Please enter a your email");
@@ -86,6 +84,15 @@ const register = async (req, res) => {
     }
 
     const user = new User({ ...req.body });
+
+    // if (user) {
+    //   (user.is_active = true),
+    //   (user.activation_date = Date.now()),
+    //   {user.permissions={
+
+    //   }}
+    // }
+
     let data = await user.save();
 
     data = JSON.parse(JSON.stringify(data));
@@ -102,15 +109,15 @@ const register = async (req, res) => {
       expiresIn: "1d",
     });
 
-    logger.info({
-      status: 200,
-      type: "success",
-      message: "User Registration Successfully",
-      data: {
-        ...response.toObject(),
-        token: token,
-      },
-    });
+    // logger.info({
+    //   status: 200,
+    //   type: "success",
+    //   message: "User Registration Successfully",
+    //   data: {
+    //     ...response.toObject(),
+    //     token: token,
+    //   },
+    // });
 
     res.status(200).json({
       status: 200,
@@ -126,7 +133,7 @@ const register = async (req, res) => {
     res.status(400).json({
       status: 400,
       type: "error",
-      message: error.message,
+      message: error,
     });
   }
 };

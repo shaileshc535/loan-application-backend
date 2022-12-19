@@ -7,6 +7,7 @@ const getConnection = async (req, res, next) => {
   }
 
   try {
+    mongoose.set("strictQuery", true);
     await mongoose.connect(process.env.DATABASE_URI);
     console.log("Database Connected to the MongoDB");
     next();

@@ -9,8 +9,9 @@ enum GenderEnum {
   OTHER = "other",
 }
 
-enum Roles {
+enum RolesEnum {
   ADMIN = "admin",
+  MANAGER = "manager",
   EMPLOYEE = "employee",
   USER = "user",
 }
@@ -23,10 +24,25 @@ export interface IUser {
   email: string;
   phone?: number;
   password: string;
-  role: Roles;
+  role: RolesEnum;
   dob: string;
   gender: GenderEnum;
   profile_photo: string;
+  is_active: boolean;
+  is_email_verified: boolean;
+  is_phone_verified: boolean;
+  activation_date: Date;
+  default_app_name: string;
+  apps: {
+    app_name: string;
+  };
+  permissions: [
+    {
+      read: boolean;
+      edit: boolean;
+      delete: boolean;
+    }
+  ];
 }
 
 const userSchema = new mongoose.Schema<IUser>(
@@ -66,7 +82,7 @@ const userSchema = new mongoose.Schema<IUser>(
       },
     },
 
-    role: { type: String, enum: Roles },
+    role: { type: String, enum: RolesEnum },
 
     gender: { type: String, enum: GenderEnum },
 
@@ -83,6 +99,28 @@ const userSchema = new mongoose.Schema<IUser>(
     },
 
     profile_photo: { type: String },
+
+    is_active: { type: Boolean, default: true },
+
+    is_email_verified: { type: Boolean, default: false },
+
+    is_phone_verified: { type: Boolean, default: false },
+
+    default_app_name: { type: String, default: "free app" },
+
+    activation_date: { type: Date, default: Date.now() },
+
+    apps: {
+      app_name: { type: String },
+    },
+
+    permissions: [
+      {
+        read: { type: Boolean, default: false },
+        edit: { type: Boolean, default: false },
+        delete: { type: Boolean, default: false },
+      },
+    ],
   },
   {
     timestamps: true,
@@ -94,6 +132,13 @@ userSchema
   .get(function (this: mongoose.HydratedDocument<IUser>) {
     return `${this.firstname} ${this.midname} ${this.lastname}`;
   });
+
+userSchema.virtual("userApps", {
+  ref: "apps",
+  localField: "apps.app_name",
+  foreignField: "_id",
+  justOne: true,
+});
 
 userSchema.set("toObject", { virtuals: true });
 userSchema.set("toJSON", { virtuals: true });
