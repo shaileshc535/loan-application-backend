@@ -356,6 +356,13 @@ const changeTempPassword = (req, res) => __awaiter(void 0, void 0, void 0, funct
 const ListAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = JSON.parse(JSON.stringify(req.user));
+        if (user.role != "admin") {
+            return res.status(404).json({
+                status: false,
+                type: "success",
+                message: "You are not authorise to Assign the Video",
+            });
+        }
         let { page, limit, sort, cond } = req.body;
         if (user) {
             cond = Object.assign({}, cond);

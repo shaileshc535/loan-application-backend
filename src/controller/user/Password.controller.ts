@@ -405,6 +405,15 @@ const changeTempPassword = async (req, res) => {
 const ListAllUsers = async (req, res: Response) => {
   try {
     const user = JSON.parse(JSON.stringify(req.user));
+
+    if (user.role != "admin") {
+      return res.status(404).json({
+        status: false,
+        type: "success",
+        message: "You are not authorise to Assign the Video",
+      });
+    }
+
     let { page, limit, sort, cond } = req.body;
 
     if (user) {

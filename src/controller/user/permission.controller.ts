@@ -4,49 +4,14 @@ const ActivateUser = async (req, res) => {
   try {
     const user = JSON.parse(JSON.stringify(req.user));
 
-    const userId = req.body.userId;
-
-    const findUser = await User.findById({ _id: userId });
-
-    if (!findUser) {
-      return res.status(404).json({
+    if (user.role != "admin") {
+      return res.status(200).json({
         status: false,
         type: "success",
-        message: "User Not Found.",
+        message: "You are not authorise to activate user.",
+        data: "",
       });
     }
-
-    const data = {
-      isactivated: true,
-    };
-
-    await User.findByIdAndUpdate(
-      {
-        _id: userId,
-      },
-      data
-    );
-
-    const result = await User.findById({ _id: userId });
-
-    res.status(200).json({
-      status: true,
-      type: "success",
-      message: "User Activated Successfully.",
-      data: result,
-    });
-  } catch (error) {
-    res.status(400).json({
-      status: 400,
-      type: "error",
-      message: error,
-    });
-  }
-};
-
-const DeactivateUser = async (req, res) => {
-  try {
-    const user = JSON.parse(JSON.stringify(req.user));
 
     const userId = req.body.userId;
 
@@ -61,7 +26,7 @@ const DeactivateUser = async (req, res) => {
     }
 
     const data = {
-      isactivated: false,
+      is_active: !findUser.is_active,
     };
 
     await User.findByIdAndUpdate(
@@ -76,7 +41,7 @@ const DeactivateUser = async (req, res) => {
     res.status(200).json({
       status: true,
       type: "success",
-      message: "User De-activated Successfully.",
+      message: "User Activation Status Changed Successfully.",
       data: result,
     });
   } catch (error) {
@@ -91,6 +56,15 @@ const DeactivateUser = async (req, res) => {
 const userRollUpdate = async (req, res) => {
   try {
     const user = JSON.parse(JSON.stringify(req.user));
+
+    if (user.role != "admin") {
+      return res.status(200).json({
+        status: false,
+        type: "success",
+        message: "You are not authorise to change user role.",
+        data: "",
+      });
+    }
 
     const userId = req.body.userId;
 
@@ -110,7 +84,7 @@ const userRollUpdate = async (req, res) => {
 
     await User.findByIdAndUpdate(
       {
-        role: userId,
+        _id: userId,
       },
       data
     );
@@ -136,6 +110,15 @@ const userPermissionsUpdate = async (req, res) => {
   try {
     const user = JSON.parse(JSON.stringify(req.user));
 
+    if (user.role != "admin") {
+      return res.status(200).json({
+        status: false,
+        type: "success",
+        message: "You are not authorise to update user permissions.",
+        data: "",
+      });
+    }
+
     const userId = req.body.userId;
 
     const findUser = await User.findById({ _id: userId });
@@ -154,7 +137,7 @@ const userPermissionsUpdate = async (req, res) => {
 
     await User.findByIdAndUpdate(
       {
-        role: userId,
+        _id: userId,
       },
       data
     );
@@ -180,6 +163,15 @@ const userAppsUpdate = async (req, res) => {
   try {
     const user = JSON.parse(JSON.stringify(req.user));
 
+    if (user.role != "admin") {
+      return res.status(200).json({
+        status: false,
+        type: "success",
+        message: "You are not authorise to update user apps.",
+        data: "",
+      });
+    }
+
     const userId = req.body.userId;
 
     const findUser = await User.findById({ _id: userId });
@@ -198,7 +190,7 @@ const userAppsUpdate = async (req, res) => {
 
     await User.findByIdAndUpdate(
       {
-        role: userId,
+        _id: userId,
       },
       data
     );
@@ -220,10 +212,117 @@ const userAppsUpdate = async (req, res) => {
   }
 };
 
+const UserEmailVerify = async (req, res) => {
+  try {
+    const user = JSON.parse(JSON.stringify(req.user));
+
+    if (user.role != "admin") {
+      return res.status(200).json({
+        status: false,
+        type: "success",
+        message: "You are not authorise to verify Email Details.",
+        data: "",
+      });
+    }
+
+    const userId = req.body.userId;
+
+    const findUser = await User.findById({ _id: userId });
+
+    if (!findUser) {
+      return res.status(404).json({
+        status: false,
+        type: "success",
+        message: "User Not Found.",
+      });
+    }
+
+    const data = {
+      is_email_verified: !findUser.is_email_verified,
+    };
+
+    await User.findByIdAndUpdate(
+      {
+        _id: userId,
+      },
+      data
+    );
+
+    const result = await User.findById({ _id: userId });
+
+    res.status(200).json({
+      status: true,
+      type: "success",
+      message: "User Email Verification Status Changed Successfully.",
+      data: result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 400,
+      type: "error",
+      message: error,
+    });
+  }
+};
+
+const UserPhoneVerify = async (req, res) => {
+  try {
+    const user = JSON.parse(JSON.stringify(req.user));
+
+    if (user.role != "admin") {
+      return res.status(200).json({
+        status: false,
+        type: "success",
+        message: "You are not authorise to verify Phone Details.",
+        data: "",
+      });
+    }
+
+    const userId = req.body.userId;
+
+    const findUser = await User.findById({ _id: userId });
+
+    if (!findUser) {
+      return res.status(404).json({
+        status: false,
+        type: "success",
+        message: "User Not Found.",
+      });
+    }
+
+    const data = {
+      is_phone_verified: !findUser.is_phone_verified,
+    };
+
+    await User.findByIdAndUpdate(
+      {
+        _id: userId,
+      },
+      data
+    );
+
+    const result = await User.findById({ _id: userId });
+
+    res.status(200).json({
+      status: true,
+      type: "success",
+      message: "User Phone Verification Status Changed Successfully.",
+      data: result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 400,
+      type: "error",
+      message: error,
+    });
+  }
+};
+
 export default {
   ActivateUser,
-  DeactivateUser,
   userRollUpdate,
   userPermissionsUpdate,
   userAppsUpdate,
+  UserEmailVerify,
+  UserPhoneVerify,
 };

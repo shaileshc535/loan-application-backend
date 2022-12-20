@@ -48,6 +48,13 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     message: "User Not Found",
                 });
             }
+            if (user.is_active === false) {
+                return res.status(200).send({
+                    type: "error",
+                    status: 200,
+                    message: "Your Account is not Activated. Please Contact with Admin to re-activate your account.",
+                });
+            }
             const passwordIsValid = bcryptjs_1.default.compareSync(password, user.password);
             if (!passwordIsValid) {
                 logger_1.default.error({

@@ -66,9 +66,11 @@ const userSchema = new mongoose_1.default.Schema({
     is_phone_verified: { type: Boolean, default: false },
     default_app_name: { type: String, default: "free app" },
     activation_date: { type: Date, default: Date.now() },
-    apps: {
-        app_name: { type: String },
-    },
+    apps: [
+        {
+            app_name: { type: String },
+        },
+    ],
     permissions: [
         {
             read: { type: Boolean, default: false },

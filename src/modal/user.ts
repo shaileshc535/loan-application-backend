@@ -33,9 +33,11 @@ export interface IUser {
   is_phone_verified: boolean;
   activation_date: Date;
   default_app_name: string;
-  apps: {
-    app_name: string;
-  };
+  apps: [
+    {
+      app_name: string;
+    }
+  ];
   permissions: [
     {
       read: boolean;
@@ -110,9 +112,11 @@ const userSchema = new mongoose.Schema<IUser>(
 
     activation_date: { type: Date, default: Date.now() },
 
-    apps: {
-      app_name: { type: String },
-    },
+    apps: [
+      {
+        app_name: { type: String },
+      },
+    ],
 
     permissions: [
       {
