@@ -36,6 +36,7 @@ const sendEmail = (email, subject, text = "", html = "") => __awaiter(void 0, vo
                 console.log(err);
                 return;
             }
+            console.log(info);
         });
         console.log("Eamil sent Successful");
     }

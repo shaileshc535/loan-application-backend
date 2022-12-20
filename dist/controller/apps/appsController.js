@@ -13,12 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Apps_Modal_1 = __importDefault(require("../../modal/Apps-Modal"));
-const http_status_codes_1 = require("http-status-codes");
-// import mongoose from "mongoose";
-// const ObjectId = <any>mongoose.Types.ObjectId;
 const CreateApp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = JSON.parse(JSON.stringify(req.user));
+        // const user = JSON.parse(JSON.stringify(req.user));
         const requestData = req.body;
         const newApp = new Apps_Modal_1.default({
             name: requestData.name,
@@ -29,23 +26,24 @@ const CreateApp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
         yield newApp.save();
         res.status(200).json({
-            type: "success",
             status: 200,
+            success: true,
             message: "New App Created successfully",
             data: newApp,
         });
     }
     catch (error) {
-        return res.status(400).json({
-            status: false,
-            type: "error",
-            message: error.message,
+        return res.status(500).send({
+            status: 500,
+            success: false,
+            errors: error,
+            msg: "Something went wrong. Please try again",
         });
     }
 });
 const EditApp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = JSON.parse(JSON.stringify(req.user));
+        // const user = JSON.parse(JSON.stringify(req.user));
         const requestData = req.body;
         const data = {
             name: requestData.name,
@@ -59,17 +57,18 @@ const EditApp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }, data);
         const result = yield Apps_Modal_1.default.findById({ _id: requestData.appId });
         res.status(200).json({
-            status: true,
-            type: "success",
+            status: 200,
+            success: true,
             message: "App Details Updated Successfully",
             data: result,
         });
     }
     catch (error) {
-        return res.status(400).json({
-            status: false,
-            type: "error",
-            message: error.message,
+        return res.status(500).send({
+            status: 500,
+            success: false,
+            errors: error,
+            msg: "Something went wrong. Please try again",
         });
     }
 });
@@ -79,8 +78,8 @@ const DeleteApp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const id = req.body.appId;
         if (user.role != "admin") {
             return res.status(404).json({
-                status: false,
-                type: "success",
+                status: 400,
+                success: false,
                 message: "You are not authorise to delete Apps.",
             });
         }
@@ -91,43 +90,45 @@ const DeleteApp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             _id: id,
         }, newData);
         res.status(200).json({
-            status: true,
-            type: "success",
+            status: 200,
+            success: true,
             message: "App Deleted Successfully.",
             data: "",
         });
     }
     catch (error) {
-        return res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
-            type: "error",
-            status: false,
-            message: error.message,
+        return res.status(500).send({
+            status: 500,
+            success: false,
+            errors: error,
+            msg: "Something went wrong. Please try again",
         });
     }
 });
 const GetAppById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = JSON.parse(JSON.stringify(req.user));
+        // const user = JSON.parse(JSON.stringify(req.user));
         const id = req.params.appId;
         const result = yield Apps_Modal_1.default.findById({ _id: id, isdeleted: false });
         res.status(200).json({
-            status: true,
-            type: "success",
+            status: 200,
+            success: true,
             message: "App Details Fetch Successfully",
             data: result,
         });
     }
     catch (error) {
-        return res.status(400).json({
-            status: false,
-            type: "error",
-            message: error.message,
+        return res.status(500).send({
+            status: 500,
+            success: false,
+            errors: error,
+            msg: "Something went wrong. Please try again",
         });
     }
 });
 const GetAppsList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = JSON.parse(JSON.stringify(req.user));
+        // const user = JSON.parse(JSON.stringify(req.user));
         let { page, limit, sort, cond } = req.body;
         let search = "";
         if (!page || page < 1) {
@@ -180,8 +181,8 @@ const GetAppsList = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             totalPages = Math.ceil(result[0].total[0].count / limit);
         }
         return res.status(200).json({
-            status: true,
-            type: "success",
+            status: 200,
+            success: true,
             message: "Apps List Fetch Successfully",
             page: page,
             limit: limit,
@@ -191,10 +192,11 @@ const GetAppsList = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         });
     }
     catch (error) {
-        console.log("error", error);
-        return res.status(400).json({
-            status: false,
-            message: error.message,
+        return res.status(500).send({
+            status: 500,
+            success: false,
+            errors: error,
+            msg: "Something went wrong. Please try again",
         });
     }
 });

@@ -1,12 +1,9 @@
 import AppModal from "../../modal/Apps-Modal";
 import { Response } from "express";
-import { StatusCodes } from "http-status-codes";
-// import mongoose from "mongoose";
-// const ObjectId = <any>mongoose.Types.ObjectId;
 
 const CreateApp = async (req, res: Response) => {
   try {
-    const user = JSON.parse(JSON.stringify(req.user));
+    // const user = JSON.parse(JSON.stringify(req.user));
 
     const requestData = req.body;
 
@@ -21,23 +18,24 @@ const CreateApp = async (req, res: Response) => {
     await newApp.save();
 
     res.status(200).json({
-      type: "success",
       status: 200,
+      success: true,
       message: "New App Created successfully",
       data: newApp,
     });
   } catch (error) {
-    return res.status(400).json({
-      status: false,
-      type: "error",
-      message: error.message,
+    return res.status(500).send({
+      status: 500,
+      success: false,
+      errors: error,
+      msg: "Something went wrong. Please try again",
     });
   }
 };
 
 const EditApp = async (req, res: Response) => {
   try {
-    const user = JSON.parse(JSON.stringify(req.user));
+    // const user = JSON.parse(JSON.stringify(req.user));
 
     const requestData = req.body;
 
@@ -59,16 +57,17 @@ const EditApp = async (req, res: Response) => {
     const result = await AppModal.findById({ _id: requestData.appId });
 
     res.status(200).json({
-      status: true,
-      type: "success",
+      status: 200,
+      success: true,
       message: "App Details Updated Successfully",
       data: result,
     });
   } catch (error) {
-    return res.status(400).json({
-      status: false,
-      type: "error",
-      message: error.message,
+    return res.status(500).send({
+      status: 500,
+      success: false,
+      errors: error,
+      msg: "Something went wrong. Please try again",
     });
   }
 };
@@ -81,8 +80,8 @@ const DeleteApp = async (req, res: Response) => {
 
     if (user.role != "admin") {
       return res.status(404).json({
-        status: false,
-        type: "success",
+        status: 400,
+        success: false,
         message: "You are not authorise to delete Apps.",
       });
     }
@@ -99,46 +98,49 @@ const DeleteApp = async (req, res: Response) => {
     );
 
     res.status(200).json({
-      status: true,
-      type: "success",
+      status: 200,
+      success: true,
       message: "App Deleted Successfully.",
       data: "",
     });
   } catch (error) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      type: "error",
-      status: false,
-      message: error.message,
+    return res.status(500).send({
+      status: 500,
+      success: false,
+      errors: error,
+      msg: "Something went wrong. Please try again",
     });
   }
 };
 
 const GetAppById = async (req, res: Response) => {
   try {
-    const user = JSON.parse(JSON.stringify(req.user));
+    // const user = JSON.parse(JSON.stringify(req.user));
 
     const id = req.params.appId;
 
     const result = await AppModal.findById({ _id: id, isdeleted: false });
 
     res.status(200).json({
-      status: true,
-      type: "success",
+      status: 200,
+      success: true,
       message: "App Details Fetch Successfully",
       data: result,
     });
   } catch (error) {
-    return res.status(400).json({
-      status: false,
-      type: "error",
-      message: error.message,
+    return res.status(500).send({
+      status: 500,
+      success: false,
+      errors: error,
+      msg: "Something went wrong. Please try again",
     });
   }
 };
 
 const GetAppsList = async (req, res: Response) => {
   try {
-    const user = JSON.parse(JSON.stringify(req.user));
+    // const user = JSON.parse(JSON.stringify(req.user));
+
     let { page, limit, sort, cond } = req.body;
 
     let search = "";
@@ -198,8 +200,8 @@ const GetAppsList = async (req, res: Response) => {
     }
 
     return res.status(200).json({
-      status: true,
-      type: "success",
+      status: 200,
+      success: true,
       message: "Apps List Fetch Successfully",
       page: page,
       limit: limit,
@@ -208,10 +210,11 @@ const GetAppsList = async (req, res: Response) => {
       data: result[0].data,
     });
   } catch (error) {
-    console.log("error", error);
-    return res.status(400).json({
-      status: false,
-      message: error.message,
+    return res.status(500).send({
+      status: 500,
+      success: false,
+      errors: error,
+      msg: "Something went wrong. Please try again",
     });
   }
 };

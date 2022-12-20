@@ -13,12 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Seo_Modal_1 = __importDefault(require("../../modal/Seo-Modal"));
-const http_status_codes_1 = require("http-status-codes");
-// import mongoose from "mongoose";
-// const ObjectId = <any>mongoose.Types.ObjectId;
 const createSEOTag = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = JSON.parse(JSON.stringify(req.user));
+        // const user = JSON.parse(JSON.stringify(req.user));
         const seo_icon_url = process.env.BASE_URL + "/public/" + req.files.seo_icon[0].filename;
         const web_icon_url = process.env.BASE_URL + "/public/" + req.files.web_icon[0].filename;
         const newSeoTag = new Seo_Modal_1.default({
@@ -39,17 +36,25 @@ const createSEOTag = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
     }
     catch (error) {
-        return res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
-            type: "error",
-            status: false,
-            message: error.message,
+        return res.status(500).send({
+            status: 500,
+            success: false,
+            errors: error,
+            msg: "Something went wrong. Please try again",
         });
     }
 });
 const editSeoTag = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = JSON.parse(JSON.stringify(req.user));
+        // const user = JSON.parse(JSON.stringify(req.user));
         const requestData = req.body;
+        if (!requestData.seoId) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: `Seo Id is required.`,
+            });
+        }
         const seo_icon_url = process.env.BASE_URL + "/public/" + req.files.seo_icon[0].filename;
         const web_icon_url = process.env.BASE_URL + "/public/" + req.files.web_icon[0].filename;
         const data = {
@@ -73,10 +78,11 @@ const editSeoTag = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
     }
     catch (error) {
-        return res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
-            type: "error",
-            status: false,
-            message: error.message,
+        return res.status(500).send({
+            status: 500,
+            success: false,
+            errors: error,
+            msg: "Something went wrong. Please try again",
         });
     }
 });
@@ -84,10 +90,17 @@ const deleteSeoTag = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     try {
         const user = JSON.parse(JSON.stringify(req.user));
         const id = req.body.seoId;
+        if (!id) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: `Seo Id is required.`,
+            });
+        }
         if (user.role != "admin") {
             return res.status(404).json({
-                status: false,
-                type: "success",
+                status: 400,
+                success: false,
                 message: "You are not authorise to delete SEO tags.",
             });
         }
@@ -105,36 +118,45 @@ const deleteSeoTag = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
     }
     catch (error) {
-        return res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
-            type: "error",
-            status: false,
-            message: error.message,
+        return res.status(500).send({
+            status: 500,
+            success: false,
+            errors: error,
+            msg: "Something went wrong. Please try again",
         });
     }
 });
 const GetSeoTagById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = JSON.parse(JSON.stringify(req.user));
+        // const user = JSON.parse(JSON.stringify(req.user));
         const id = req.params.seoId;
+        if (!id) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: `Seo Id is required.`,
+            });
+        }
         const result = yield Seo_Modal_1.default.findById({ _id: id, isdeleted: false });
         res.status(200).json({
-            status: true,
-            type: "success",
+            status: 200,
+            success: true,
             message: "SEO Tag Details Fetch Successfully",
             data: result,
         });
     }
     catch (error) {
-        return res.status(400).json({
-            status: false,
-            type: "error",
-            message: error.message,
+        return res.status(500).send({
+            status: 500,
+            success: false,
+            errors: error,
+            msg: "Something went wrong. Please try again",
         });
     }
 });
 const GetSeoTagList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = JSON.parse(JSON.stringify(req.user));
+        // const user = JSON.parse(JSON.stringify(req.user));
         let { page, limit, sort, cond } = req.body;
         let search = "";
         if (!page || page < 1) {
@@ -188,8 +210,8 @@ const GetSeoTagList = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             totalPages = Math.ceil(result[0].total[0].count / limit);
         }
         return res.status(200).json({
-            status: true,
-            type: "success",
+            status: 200,
+            success: true,
             message: "SEO Tag's Fetch Successfully",
             page: page,
             limit: limit,
@@ -199,10 +221,11 @@ const GetSeoTagList = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         });
     }
     catch (error) {
-        console.log("error", error);
-        return res.status(400).json({
-            status: false,
-            message: error.message,
+        return res.status(500).send({
+            status: 500,
+            success: false,
+            errors: error,
+            msg: "Something went wrong. Please try again",
         });
     }
 });

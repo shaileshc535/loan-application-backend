@@ -23,5 +23,6 @@ router.post("/user-app-update", auth_middleware_1.default, permission_controller
 router.post("/user-email-verify", auth_middleware_1.default, permission_controller_1.default.UserEmailVerify);
 router.post("/user-phone-verify", auth_middleware_1.default, permission_controller_1.default.UserPhoneVerify);
 router.post("/user-permission-update", auth_middleware_1.default, permission_controller_1.default.userPermissionsUpdate);
+router.post("/send-phone-otp", permission_controller_1.default.SendPhoneOTP);
 exports.default = router;
 //# sourceMappingURL=userRoute.js.map

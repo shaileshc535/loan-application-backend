@@ -18,34 +18,23 @@ const sendEmail_1 = __importDefault(require("../../services/sendEmail"));
 const crypto_1 = __importDefault(require("crypto"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const joi_1 = __importDefault(require("joi"));
-const logger_1 = __importDefault(require("../../logger"));
 const forgotPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email } = req.body;
         const schema = joi_1.default.object({ email: joi_1.default.string().email().required() });
         const { error } = schema.validate(req.body);
         if (error) {
-            logger_1.default.error({
-                type: "error",
-                status: 400,
-                message: error.details[0].message,
-            });
             return res.status(400).send({
-                type: "error",
                 status: 400,
+                success: false,
                 message: error.details[0].message,
             });
         }
         const user = yield user_1.default.findOne({ email: email });
         if (!user) {
-            logger_1.default.error({
-                type: "error",
-                status: 400,
-                message: "user with given email doesn't exist",
-            });
             return res.status(400).send({
-                type: "error",
                 status: 400,
+                success: false,
                 message: "user with given email doesn't exist",
             });
         }
@@ -69,25 +58,19 @@ const forgotPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         yield user.save({ validateBeforeSave: false });
         // await token.delete();
         yield (0, sendEmail_1.default)(user.email, "Here is your temprory created Password", tempPass);
-        logger_1.default.info({
-            type: "success",
-            status: 200,
-            message: "Temp Password",
-            Password_Reset_Link: tempPass,
-        });
         res.status(200).json({
-            type: "success",
             status: 200,
+            success: true,
             message: "Temp Password",
             Password_Reset_Link: tempPass,
         });
     }
-    catch (err) {
-        logger_1.default.error(err.message);
-        res.status(404).json({
-            type: "error",
-            status: 404,
-            message: "An Error Occured Please Try After Some Time!",
+    catch (error) {
+        res.status(500).send({
+            status: 500,
+            success: false,
+            errors: error.message,
+            msg: "Something went wrong. Please try again",
         });
     }
 });
@@ -102,27 +85,17 @@ const resetPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         });
         const { error } = schema.validate(req.body);
         if (error) {
-            logger_1.default.error({
-                type: "error",
-                status: 400,
-                message: error.details[0].message,
-            });
             return res.status(400).send({
-                type: "error",
                 status: 400,
+                success: false,
                 message: error.details[0].message,
             });
         }
         const user = yield user_1.default.findById(req.params.userId);
         if (!user) {
-            logger_1.default.error({
-                type: "error",
-                status: 400,
-                message: "Invalid Link or expired",
-            });
             return res.status(400).send({
-                type: "error",
                 status: 400,
+                success: false,
                 message: "Invalid Link or expired",
             });
         }
@@ -131,61 +104,41 @@ const resetPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             token: req.params.token,
         });
         if (!token) {
-            logger_1.default.error({
-                type: "error",
-                status: 400,
-                message: "Invalid Link or expired",
-            });
             return res.status(400).send({
-                type: "error",
                 status: 400,
+                success: false,
                 message: "Invalid Link or expired",
             });
         }
         if (!pass_rgex.test(password)) {
-            logger_1.default.error({
-                type: "error",
-                status: 400,
-                message: "Password must have minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character",
-            });
             return res.status(400).json({
-                type: "error",
                 status: 400,
+                success: false,
                 message: "Password must have minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character",
             });
         }
         if (password !== confirmPassword) {
-            logger_1.default.error({
-                type: "error",
-                status: 400,
-                message: "Password didn't Match",
-            });
             return res.status(400).json({
-                type: "error",
                 status: 400,
+                success: false,
                 message: "Password didn't Match",
             });
         }
         user.password = password;
         yield user.save({ validateBeforeSave: false });
         yield token.delete();
-        logger_1.default.info({
-            type: "success",
-            status: 200,
-            message: "Password Changed!",
-        });
         return res.status(200).json({
-            type: "success",
             status: 200,
+            success: true,
             message: "Password Changed!",
         });
     }
-    catch (err) {
-        logger_1.default.error(err.message);
-        return res.status(404).json({
-            type: "error",
-            status: 404,
-            message: "An Error Occured!",
+    catch (error) {
+        return res.status(500).send({
+            status: 500,
+            success: false,
+            errors: error,
+            msg: "Something went wrong. Please try again",
         });
     }
 });
@@ -202,75 +155,49 @@ const changePassword = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         });
         const { error } = schema.validate(req.body);
         if (error) {
-            logger_1.default.error({
-                type: "error",
-                status: 400,
-                message: error.details[0].message,
-            });
             return res.status(400).send({
-                type: "error",
                 status: 400,
+                success: false,
                 message: error.details[0].message,
             });
         }
         const passwordIsValid = bcryptjs_1.default.compareSync(currentPassword, user.password);
         if (!passwordIsValid) {
-            logger_1.default.error({
-                type: "error",
-                status: 400,
-                message: "Invalid Current Password!",
-            });
             return res.status(400).send({
-                type: "error",
                 status: 400,
+                success: false,
                 message: "Invalid Current Password!",
             });
         }
         if (!pass_rgex.test(newPassword)) {
-            logger_1.default.error({
-                type: "error",
-                status: 400,
-                message: "Password must have minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character",
-            });
             return res.status(400).json({
-                type: "error",
                 status: 400,
+                success: false,
                 message: "Password must have minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character",
             });
         }
         if (newPassword !== confirmNewPassword) {
-            logger_1.default.error({
-                type: "error",
-                status: 400,
-                message: "New Password and Confirm Password Is not same",
-            });
             return res.status(400).json({
-                type: "error",
                 status: 400,
+                success: false,
                 message: "New Password and Confirm Password Is not same",
             });
         }
         user.password = newPassword;
         yield user.save({ validateBeforeSave: false });
-        logger_1.default.info({
-            type: "success",
-            status: 200,
-            message: "Password changed successful",
-            data: user,
-        });
         return res.status(200).json({
-            type: "success",
             status: 200,
+            success: true,
             message: "Password changed successful",
             data: user,
         });
     }
     catch (error) {
-        logger_1.default.error(error.message);
-        return res.status(404).json({
-            type: "error",
-            status: 404,
-            message: error.message,
+        return res.status(500).send({
+            status: 500,
+            success: false,
+            errors: error,
+            msg: "Something went wrong. Please try again",
         });
     }
 });
@@ -281,75 +208,49 @@ const changeTempPassword = (req, res) => __awaiter(void 0, void 0, void 0, funct
         const schema = joi_1.default.object({ email: joi_1.default.string().email().required() });
         const user = yield user_1.default.findOne({ email: email });
         if (!user) {
-            logger_1.default.error({
-                type: "error",
-                status: 400,
-                message: "user with given email doesn't exist",
-            });
             return res.status(400).send({
-                type: "error",
                 status: 400,
+                success: false,
                 message: "user with given email doesn't exist",
             });
         }
         const passwordIsValid = bcryptjs_1.default.compareSync(tmp_password, user.password);
         if (!passwordIsValid) {
-            logger_1.default.error({
-                type: "error",
-                status: 400,
-                message: "Invalid Current Password!",
-            });
             return res.status(400).send({
-                type: "error",
                 status: 400,
+                success: false,
                 message: "Invalid Current Password!",
             });
         }
         if (!pass_rgex.test(new_password)) {
-            logger_1.default.error({
-                type: "error",
-                status: 400,
-                message: "Password must have minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character",
-            });
             return res.status(400).json({
-                type: "error",
                 status: 400,
+                success: false,
                 message: "Password must have minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character",
             });
         }
         if (new_password !== confirm_password) {
-            logger_1.default.error({
-                type: "error",
-                status: 400,
-                message: "New Password and Confirm Password Is not same",
-            });
             return res.status(400).json({
-                type: "error",
                 status: 400,
+                success: false,
                 message: "New Password and Confirm Password Is not same",
             });
         }
         user.password = new_password;
         yield user.save({ validateBeforeSave: false });
-        logger_1.default.info({
-            type: "success",
-            status: 200,
-            message: "Password changed successful",
-            data: user,
-        });
         return res.status(200).json({
-            type: "success",
             status: 200,
+            success: true,
             message: "Password changed successful",
             data: user,
         });
     }
-    catch (err) {
-        logger_1.default.error(err.message);
-        return res.status(404).json({
-            type: "error",
-            status: 404,
-            message: err.message,
+    catch (error) {
+        return res.status(500).send({
+            status: 500,
+            success: false,
+            errors: error,
+            msg: "Something went wrong. Please try again",
         });
     }
 });
@@ -357,9 +258,9 @@ const ListAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     try {
         const user = JSON.parse(JSON.stringify(req.user));
         if (user.role != "admin") {
-            return res.status(404).json({
-                status: false,
-                type: "success",
+            return res.status(400).json({
+                status: 400,
+                success: false,
                 message: "You are not authorise to Assign the Video",
             });
         }
@@ -386,19 +287,9 @@ const ListAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             .limit(limit);
         const result_count = yield user_1.default.find(cond).count();
         const totalPages = Math.ceil(result_count / limit);
-        logger_1.default.info({
-            status: 200,
-            type: "success",
-            message: "Users Fetch Successfully",
-            page: page,
-            limit: limit,
-            totalPages: totalPages,
-            total: result_count,
-            data: result,
-        });
         return res.status(200).json({
             status: 200,
-            type: "success",
+            success: true,
             message: "Users Fetch Successfully",
             page: page,
             limit: limit,
@@ -408,11 +299,11 @@ const ListAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
     }
     catch (error) {
-        logger_1.default.error(error.message);
-        return res.status(404).json({
-            type: "error",
-            status: 404,
-            message: error.message,
+        return res.status(500).send({
+            status: 500,
+            success: false,
+            errors: error,
+            msg: "Something went wrong. Please try again",
         });
     }
 });

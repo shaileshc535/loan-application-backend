@@ -37,4 +37,6 @@ router.post(
   PermissionController.userPermissionsUpdate
 );
 
+router.post("/send-phone-otp", PermissionController.SendPhoneOTP);
+
 export default router;
