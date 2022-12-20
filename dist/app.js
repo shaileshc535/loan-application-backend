@@ -9,7 +9,6 @@ const method_override_1 = __importDefault(require("method-override"));
 const dotenv_1 = require("dotenv");
 const connection_1 = __importDefault(require("./config/connection"));
 const index_1 = __importDefault(require("./routes/index"));
-// import logger from "./logger";
 const path_1 = __importDefault(require("path"));
 const morgan_1 = __importDefault(require("morgan"));
 const fs_1 = __importDefault(require("fs"));
@@ -23,7 +22,7 @@ app.use((0, morgan_1.default)("dev", {
 }));
 // log all requests to access.log
 app.use((0, morgan_1.default)("common", {
-    stream: fs_1.default.createWriteStream(path_1.default.join(__dirname, "../logs/access.log"), {
+    stream: fs_1.default.createWriteStream(path_1.default.join(__dirname, "access.log"), {
         flags: "a",
     }),
 }));

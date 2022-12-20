@@ -4,7 +4,6 @@ import methodOverride from "method-override";
 import { config } from "dotenv";
 import getConnection from "./config/connection";
 import Router from "./routes/index";
-// import logger from "./logger";
 import path from "path";
 import morgan from "morgan";
 import fs from "fs";
@@ -24,7 +23,7 @@ app.use(
 // log all requests to access.log
 app.use(
   morgan("common", {
-    stream: fs.createWriteStream(path.join(__dirname, "../logs/access.log"), {
+    stream: fs.createWriteStream(path.join(__dirname, "access.log"), {
       flags: "a",
     }),
   })
