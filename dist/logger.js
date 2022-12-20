@@ -1,5 +1,24 @@
 "use strict";
+// import fs from "fs";
+// import path from "path";
 Object.defineProperty(exports, "__esModule", { value: true });
+// const logging = {};
+// logging.log = (methodName, errMsg) => {
+//   const date = new Date().toString();
+//   const data = "\n=> Error in " + methodName + " >>> " + errMsg + " at " + date;
+//   const milliseconds =
+//     new Date().getDate() +
+//     "-" +
+//     parseInt(new Date().getMonth() + 1) +
+//     "-" +
+//     new Date().getFullYear();
+//   const jsonPath = path.join(__dirname, "logs/");
+//   fs.appendFile(jsonPath + milliseconds.toString(), data, function (err) {
+//     // if (err) throw err;
+//     console.log("Updated!");
+//   });
+// };
+// module.exports = logging;
 const winston_1 = require("winston");
 const logger = (0, winston_1.createLogger)({
     transports: [
@@ -17,22 +36,4 @@ const logger = (0, winston_1.createLogger)({
     format: winston_1.format.combine(winston_1.format.metadata(), winston_1.format.timestamp()),
 });
 exports.default = logger;
-// import path from "path";
-// const logging = {};
-// logging.log = (methodName, errMsg) => {
-//   const date = new Date().toString();
-//   const data = "\n=> Error in " + methodName + " >>> " + errMsg + " at " + date;
-//   const milliseconds =
-//     new Date().getDate() +
-//     "-" +
-//     // parseInt(new Date().getMonth() + 1) +
-//     "-" +
-//     new Date().getFullYear();
-//   const jsonPath = path.join(__dirname, "logs/");
-//   fs.appendFile(jsonPath + milliseconds.toString(), data, function (err) {
-//     if (err) throw err;
-//     console.log("Updated!");
-//   });
-// };
-// export default logging;
 //# sourceMappingURL=logger.js.map

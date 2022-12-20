@@ -1,3 +1,25 @@
+// import fs from "fs";
+// import path from "path";
+
+// const logging = {};
+
+// logging.log = (methodName, errMsg) => {
+//   const date = new Date().toString();
+//   const data = "\n=> Error in " + methodName + " >>> " + errMsg + " at " + date;
+//   const milliseconds =
+//     new Date().getDate() +
+//     "-" +
+//     parseInt(new Date().getMonth() + 1) +
+//     "-" +
+//     new Date().getFullYear();
+//   const jsonPath = path.join(__dirname, "logs/");
+//   fs.appendFile(jsonPath + milliseconds.toString(), data, function (err) {
+//     // if (err) throw err;
+//     console.log("Updated!");
+//   });
+// };
+// module.exports = logging;
+
 import { createLogger, transports, format } from "winston";
 
 const logger = createLogger({
@@ -23,25 +45,3 @@ const logger = createLogger({
 });
 
 export default logger;
-
-// import path from "path";
-
-// const logging = {};
-
-// logging.log = (methodName, errMsg) => {
-//   const date = new Date().toString();
-//   const data = "\n=> Error in " + methodName + " >>> " + errMsg + " at " + date;
-//   const milliseconds =
-//     new Date().getDate() +
-//     "-" +
-//     // parseInt(new Date().getMonth() + 1) +
-//     "-" +
-//     new Date().getFullYear();
-//   const jsonPath = path.join(__dirname, "logs/");
-//   fs.appendFile(jsonPath + milliseconds.toString(), data, function (err) {
-//     if (err) throw err;
-//     console.log("Updated!");
-//   });
-// };
-
-// export default logging;
