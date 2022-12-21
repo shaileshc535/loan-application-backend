@@ -8,6 +8,9 @@ import loanRoute from "./loanRoute";
 import loanCalculatorRoute from "./loanCalculatorRoute";
 import blogCategoryRoutes from "./blogCategoryRoutes";
 import blogRoutes from "./blogRoutes";
+import faqRoutes from "./faqRoutes";
+import locationRoutes from "./locationRoutes";
+import userAddressRoutes from "./userAddressRoutes";
 
 const Router = express.Router();
 
@@ -28,5 +31,11 @@ Router.use("/", loanCalculatorRoute);
 Router.use("/blog-category", blogCategoryRoutes);
 
 Router.use("/blog", blogRoutes);
+
+Router.use("/faq", faqRoutes);
+
+Router.use("/location", locationRoutes);
+
+Router.use("/user-address", userAddressRoutes);
 
 export default Router;
