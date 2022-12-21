@@ -36,10 +36,11 @@ const seoTagMulterUpload = upload.fields([
     { name: "web_icon", maxCount: 1 },
 ]);
 const router = express_1.default.Router();
-router.post("/create-seo-tag", auth_middleware_1.default, seoTagMulterUpload, seoController_1.default.createSEOTag);
-router.post("/edit-seo-tag", auth_middleware_1.default, seoTagMulterUpload, seoController_1.default.editSeoTag);
-router.post("/delete-seo-tag", auth_middleware_1.default, seoController_1.default.deleteSeoTag);
-router.get("/get-seo-tag/:seoId", auth_middleware_1.default, seoController_1.default.GetSeoTagById);
-router.post("/get-seo-tag", auth_middleware_1.default, seoController_1.default.GetSeoTagList);
+router.post("/create", auth_middleware_1.default, seoTagMulterUpload, seoController_1.default.createSEOTag);
+router.put("/edit", auth_middleware_1.default, seoTagMulterUpload, seoController_1.default.editSeoTag);
+router.put("/delete", auth_middleware_1.default, seoController_1.default.deleteSeoTag);
+router.put("/change-activate-status", auth_middleware_1.default, seoController_1.default.activateDeactiveLoan);
+router.get("/seo-tag/:seoId", auth_middleware_1.default, seoController_1.default.GetSeoTagById);
+router.post("/seo-tag", auth_middleware_1.default, seoController_1.default.GetSeoTagList);
 exports.default = router;
 //# sourceMappingURL=seoRoutes.js.map

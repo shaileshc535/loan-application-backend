@@ -113,6 +113,71 @@ const DeleteApp = async (req, res: Response) => {
   }
 };
 
+const activateDeactiveApp = async (req, res: Response) => {
+  try {
+    const user = JSON.parse(JSON.stringify(req.user));
+
+    const requestData = req.body;
+
+    if (user.role != "admin") {
+      return res.status(400).json({
+        status: 400,
+        success: false,
+        message: "You are not authorise to update App details.",
+      });
+    }
+
+    if (!requestData.appId) {
+      return res.status(400).json({
+        status: 400,
+        success: false,
+        message: "App Id is required.",
+      });
+    }
+
+    const Data = await AppModal.findById({
+      _id: requestData.appId,
+    });
+
+    if (!Data) {
+      return res.status(400).json({
+        status: 400,
+        success: false,
+        message: "App not found.",
+      });
+    }
+
+    const data = {
+      isactive: !Data.isactive,
+    };
+
+    await AppModal.findByIdAndUpdate(
+      {
+        _id: requestData.appId,
+      },
+      data
+    );
+
+    const result = await AppModal.findById({
+      _id: requestData.appId,
+    });
+
+    res.status(200).json({
+      status: 200,
+      success: true,
+      message: "App Status Updated Successfully",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      status: 500,
+      success: false,
+      errors: error,
+      msg: "Something went wrong. Please try again",
+    });
+  }
+};
+
 const GetAppById = async (req, res: Response) => {
   try {
     // const user = JSON.parse(JSON.stringify(req.user));
@@ -223,6 +288,7 @@ export default {
   CreateApp,
   EditApp,
   DeleteApp,
+  activateDeactiveApp,
   GetAppById,
   GetAppsList,
 };

@@ -378,53 +378,6 @@ const ListLoan = async (req, res: Response) => {
   }
 };
 
-const LoanCalculator = async (req, res: Response) => {
-  try {
-    const requestedData = req.body;
-
-    const loanAmount = Number(requestedData.loanAmount);
-
-    const loanInsterRate = Number(requestedData.loanInsterRate);
-
-    const loan_tenure = Number(requestedData.loan_tenure);
-
-    const tenure = loan_tenure * 12;
-
-    if (loanAmount !== null && loanInsterRate !== 0) {
-      const RateOfIntrest = loanInsterRate / 12 / 100;
-
-      const EMI = Number(
-        loanAmount *
-          RateOfIntrest *
-          (Math.pow(1 + RateOfIntrest, tenure) /
-            (Math.pow(1 + RateOfIntrest, tenure) - 1))
-      );
-
-      const total_amount = EMI * tenure;
-
-      return res.status(200).json({
-        status: 200,
-        success: true,
-        message: "Loan Amount Calculate successfully",
-        data: [EMI, total_amount],
-      });
-    }
-
-    res.status(200).json({
-      status: 200,
-      success: true,
-      message: "Loan details fetch successfully",
-    });
-  } catch (error) {
-    return res.status(500).send({
-      status: 500,
-      success: false,
-      errors: error,
-      msg: "Something went wrong. Please try again",
-    });
-  }
-};
-
 export default {
   createLoan,
   updateLoan,
@@ -432,5 +385,4 @@ export default {
   activateDeactiveLoan,
   findByIdLoan,
   ListLoan,
-  LoanCalculator,
 };

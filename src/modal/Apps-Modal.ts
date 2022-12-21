@@ -7,6 +7,7 @@ export interface IApps {
   permission: Array<string>;
   roles: Array<string>;
   isdeleted: boolean;
+  isactive: boolean;
 }
 
 const AppSchema = new Schema<IApps>(
@@ -26,6 +27,10 @@ const AppSchema = new Schema<IApps>(
     isdeleted: {
       type: Boolean,
       default: false,
+    },
+    isactive: {
+      type: Boolean,
+      default: true,
     },
   },
   {

@@ -9,6 +9,7 @@ export interface ISeo {
   seo_icon: string;
   web_icon: string;
   isdeleted: boolean;
+  isactive: boolean;
 }
 
 const SeoSchema = new Schema<ISeo>(
@@ -40,6 +41,10 @@ const SeoSchema = new Schema<ISeo>(
     isdeleted: {
       type: Boolean,
       default: false,
+    },
+    isactive: {
+      type: Boolean,
+      default: true,
     },
   },
   {

@@ -4,20 +4,20 @@ import auth from "../middlewares/auth.middleware";
 
 const router = express.Router();
 
-router.post("/create-loan-subcategory", auth, controller.createLoanSubCategory);
+router.post("/create", auth, controller.createLoanSubCategory);
 
-router.post("/edit-loan-subcategory", auth, controller.updateLoanSubCategory);
+router.put("/edit", auth, controller.updateLoanSubCategory);
 
-router.post("/delete-loan-subcategory", auth, controller.deleteLoanSubCategory);
+router.put("/delete", auth, controller.deleteLoanSubCategory);
 
-router.post(
-  "/activate-loan-subcategory",
+router.put(
+  "/change-activate-status",
   auth,
   controller.activateDeactiveLoanSubCategory
 );
 
 router.get("/loan-subcategory/:id", controller.findByIdLoanSubCategory);
 
-router.post("/loan-subcategory-list", controller.ListLoanSubCategory);
+router.post("/loan-subcategory", controller.ListLoanSubCategory);
 
 export default router;

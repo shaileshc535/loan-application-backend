@@ -27,19 +27,16 @@ const seoTagMulterUpload = upload.fields([
 
 const router = express.Router();
 
-router.post(
-  "/create-seo-tag",
-  auth,
-  seoTagMulterUpload,
-  controller.createSEOTag
-);
+router.post("/create", auth, seoTagMulterUpload, controller.createSEOTag);
 
-router.post("/edit-seo-tag", auth, seoTagMulterUpload, controller.editSeoTag);
+router.put("/edit", auth, seoTagMulterUpload, controller.editSeoTag);
 
-router.post("/delete-seo-tag", auth, controller.deleteSeoTag);
+router.put("/delete", auth, controller.deleteSeoTag);
 
-router.get("/get-seo-tag/:seoId", auth, controller.GetSeoTagById);
+router.put("/change-activate-status", auth, controller.activateDeactiveLoan);
 
-router.post("/get-seo-tag", auth, controller.GetSeoTagList);
+router.get("/seo-tag/:seoId", auth, controller.GetSeoTagById);
+
+router.post("/seo-tag", auth, controller.GetSeoTagList);
 
 export default router;

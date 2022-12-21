@@ -21,17 +21,17 @@ router.post("/password-change", auth, Passwordcontroller.changePassword);
 
 router.post("/list-users", auth, Passwordcontroller.ListAllUsers);
 
-router.post("/activate-users", auth, PermissionController.ActivateUser);
+router.put("/change-activate-status", auth, PermissionController.ActivateUser);
 
-router.post("/user-role-update", auth, PermissionController.userRollUpdate);
+router.put("/user-role-update", auth, PermissionController.userRollUpdate);
 
-router.post("/user-app-update", auth, PermissionController.userAppsUpdate);
+router.put("/user-app-update", auth, PermissionController.userAppsUpdate);
 
-router.post("/user-email-verify", auth, PermissionController.UserEmailVerify);
+router.put("/user-email-verify", auth, PermissionController.UserEmailVerify);
 
-router.post("/user-phone-verify", auth, PermissionController.UserPhoneVerify);
+router.put("/user-phone-verify", auth, PermissionController.UserPhoneVerify);
 
-router.post(
+router.put(
   "/user-permission-update",
   auth,
   PermissionController.userPermissionsUpdate

@@ -4,14 +4,16 @@ import auth from "../middlewares/auth.middleware";
 
 const router = express.Router();
 
-router.post("/create-app", auth, controller.CreateApp);
+router.post("/create", auth, controller.CreateApp);
 
-router.post("/edit-app", auth, controller.EditApp);
+router.put("/edit", auth, controller.EditApp);
 
-router.post("/delete-app", auth, controller.DeleteApp);
+router.put("/delete", auth, controller.DeleteApp);
 
-router.get("/get-app/:appId", auth, controller.GetAppById);
+router.put("/change-activate-status", auth, controller.activateDeactiveApp);
 
-router.post("/get-app", auth, controller.GetAppsList);
+router.get("/app/:appId", controller.GetAppById);
+
+router.post("/app-list", controller.GetAppsList);
 
 export default router;

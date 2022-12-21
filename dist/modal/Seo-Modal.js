@@ -30,6 +30,10 @@ const SeoSchema = new mongoose_1.Schema({
         type: Boolean,
         default: false,
     },
+    isactive: {
+        type: Boolean,
+        default: true,
+    },
 }, {
     timestamps: true,
 });

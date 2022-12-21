@@ -4,18 +4,16 @@ import auth from "../middlewares/auth.middleware";
 
 const router = express.Router();
 
-router.post("/create-loan", auth, controller.createLoan);
+router.post("/create", auth, controller.createLoan);
 
-router.post("/edit-loan", auth, controller.updateLoan);
+router.put("/edit", auth, controller.updateLoan);
 
-router.post("/delete-loan", auth, controller.deleteLoan);
+router.put("/delete", auth, controller.deleteLoan);
 
-router.post("/activate-loan", auth, controller.activateDeactiveLoan);
+router.put("/change-activate-status", auth, controller.activateDeactiveLoan);
 
 router.get("/loan/:id", controller.findByIdLoan);
 
-router.post("/loan-list", controller.ListLoan);
-
-router.post("/calculate", controller.LoanCalculator);
+router.post("/loan", controller.ListLoan);
 
 export default router;
