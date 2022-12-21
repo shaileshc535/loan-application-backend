@@ -1,5 +1,7 @@
 import userAddressModel from "../../modal/userAddressModel";
 import { Response } from "express";
+// import mongoose from "mongoose";
+// const ObjectId = <any>mongoose.Types.ObjectId;
 
 const createUserAddress = async (req, res: Response) => {
   try {
@@ -68,14 +70,6 @@ const editUserAddress = async (req, res: Response) => {
   try {
     const user = JSON.parse(JSON.stringify(req.user));
 
-    if (!user) {
-      return res.status(404).json({
-        status: 400,
-        success: false,
-        message: "User details are Required.",
-      });
-    }
-
     const requestedData = req.body;
 
     if (!requestedData.addressId) {
@@ -88,6 +82,7 @@ const editUserAddress = async (req, res: Response) => {
 
     const address = await userAddressModel.findById({
       _id: requestedData.addressId,
+      user_id: user._id,
     });
 
     if (!address) {
@@ -95,14 +90,6 @@ const editUserAddress = async (req, res: Response) => {
         status: 400,
         success: false,
         message: `User Address not found.`,
-      });
-    }
-
-    if (address._id !== user._id) {
-      return res.status(400).json({
-        status: 400,
-        success: false,
-        message: `You are not authorise to update User Address.`,
       });
     }
 
@@ -163,6 +150,7 @@ const deleteUserAddress = async (req, res: Response) => {
 
     const result = await userAddressModel.findById({
       _id: id,
+      user_id: user._id,
     });
 
     if (!result) {
@@ -170,13 +158,6 @@ const deleteUserAddress = async (req, res: Response) => {
         status: 400,
         success: false,
         message: `User Address not found.`,
-      });
-    }
-    if (result._id !== user._id) {
-      return res.status(400).json({
-        status: 400,
-        success: false,
-        message: `You are not authorise to delete User Address.`,
       });
     }
 
@@ -192,8 +173,8 @@ const deleteUserAddress = async (req, res: Response) => {
     );
 
     res.status(200).json({
-      status: true,
-      type: "success",
+      status: 200,
+      success: true,
       message: "User Address Deleted Successfully.",
       data: "",
     });
@@ -223,6 +204,7 @@ const activateDeactiveUserAddress = async (req, res: Response) => {
 
     const address = await userAddressModel.findById({
       _id: id,
+      user_id: user._id,
     });
 
     if (!address) {
@@ -230,13 +212,6 @@ const activateDeactiveUserAddress = async (req, res: Response) => {
         status: 400,
         success: false,
         message: `User Address not found.`,
-      });
-    }
-    if (address._id !== user._id) {
-      return res.status(400).json({
-        status: 400,
-        success: false,
-        message: `You are not authorise to update User Address.`,
       });
     }
 
@@ -275,7 +250,7 @@ const GetUserAddressById = async (req, res: Response) => {
   try {
     const user = JSON.parse(JSON.stringify(req.user));
 
-    const id = req.params.addressId;
+    const id = req.params.id;
 
     if (!id) {
       return res.status(400).json({
@@ -298,11 +273,16 @@ const GetUserAddressById = async (req, res: Response) => {
       });
     }
 
-    const result = await userAddressModel.findById({
-      _id: id,
-      isdeleted: false,
-      isactive: true,
-    });
+    const result = await userAddressModel
+      .findById({
+        _id: id,
+        isdeleted: false,
+        isactive: true,
+      })
+      .populate("user_id")
+      .populate("city")
+      .populate("state")
+      .populate("country");
 
     res.status(200).json({
       status: 200,
@@ -322,65 +302,46 @@ const GetUserAddressById = async (req, res: Response) => {
 
 const GetUserAddressList = async (req, res: Response) => {
   try {
-    // const user = JSON.parse(JSON.stringify(req.user));
+    const user = JSON.parse(JSON.stringify(req.user));
 
     let { page, limit, sort, cond } = req.body;
 
-    let search = "";
+    if (user) {
+      cond = {
+        user_id: user._id,
+        isdeleted: false,
+        ...cond,
+      };
+    }
 
     if (!page || page < 1) {
       page = 1;
     }
     if (!limit) {
-      limit = 9;
+      limit = 10;
     }
     if (!cond) {
       cond = {};
     }
-
     if (!sort) {
       sort = { createdAt: -1 };
     }
-    if (typeof cond.search != "undefined" && cond.search != null) {
-      search = String(cond.search);
-      delete cond.search;
-    }
 
-    cond = [
-      {
-        $match: {
-          isdeleted: false,
-          $and: [
-            cond,
-            {
-              $or: [
-                { address: { $regex: search, $options: "i" } },
-                { city: { $regex: search, $options: "i" } },
-              ],
-            },
-          ],
-        },
-      },
-      { $sort: sort },
-      {
-        $facet: {
-          data: [{ $skip: (page - 1) * limit }, { $limit: limit }],
-          total: [
-            {
-              $count: "count",
-            },
-          ],
-        },
-      },
-    ];
     limit = parseInt(limit);
 
-    const result = await userAddressModel.aggregate(cond);
+    const result = await userAddressModel
+      .find(cond)
+      .populate("user_id")
+      .populate("city")
+      .populate("state")
+      .populate("country")
+      .sort(sort)
+      .skip((page - 1) * limit)
+      .limit(limit);
 
-    let totalPages = 0;
-    if (result[0].total.length != 0) {
-      totalPages = Math.ceil(result[0].total[0].count / limit);
-    }
+    const result_count = await userAddressModel.find(cond).count();
+
+    const totalPages = Math.ceil(result_count / limit);
 
     return res.status(200).json({
       status: 200,
@@ -389,8 +350,8 @@ const GetUserAddressList = async (req, res: Response) => {
       page: page,
       limit: limit,
       totalPages: totalPages,
-      total: result[0].total.length != 0 ? result[0].total[0].count : 0,
-      data: result[0].data,
+      total: result_count,
+      data: result,
     });
   } catch (error) {
     return res.status(500).send({

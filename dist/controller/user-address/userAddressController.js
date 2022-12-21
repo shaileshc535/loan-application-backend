@@ -13,6 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const userAddressModel_1 = __importDefault(require("../../modal/userAddressModel"));
+// import mongoose from "mongoose";
+// const ObjectId = <any>mongoose.Types.ObjectId;
 const createUserAddress = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = JSON.parse(JSON.stringify(req.user));
@@ -72,13 +74,6 @@ const createUserAddress = (req, res) => __awaiter(void 0, void 0, void 0, functi
 const editUserAddress = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = JSON.parse(JSON.stringify(req.user));
-        if (!user) {
-            return res.status(404).json({
-                status: 400,
-                success: false,
-                message: "User details are Required.",
-            });
-        }
         const requestedData = req.body;
         if (!requestedData.addressId) {
             return res.status(400).json({
@@ -89,19 +84,13 @@ const editUserAddress = (req, res) => __awaiter(void 0, void 0, void 0, function
         }
         const address = yield userAddressModel_1.default.findById({
             _id: requestedData.addressId,
+            user_id: user._id,
         });
         if (!address) {
             return res.status(400).json({
                 status: 400,
                 success: false,
                 message: `User Address not found.`,
-            });
-        }
-        if (address._id !== user._id) {
-            return res.status(400).json({
-                status: 400,
-                success: false,
-                message: `You are not authorise to update User Address.`,
             });
         }
         const data = {
@@ -152,19 +141,13 @@ const deleteUserAddress = (req, res) => __awaiter(void 0, void 0, void 0, functi
         }
         const result = yield userAddressModel_1.default.findById({
             _id: id,
+            user_id: user._id,
         });
         if (!result) {
             return res.status(400).json({
                 status: 400,
                 success: false,
                 message: `User Address not found.`,
-            });
-        }
-        if (result._id !== user._id) {
-            return res.status(400).json({
-                status: 400,
-                success: false,
-                message: `You are not authorise to delete User Address.`,
             });
         }
         const newData = {
@@ -174,8 +157,8 @@ const deleteUserAddress = (req, res) => __awaiter(void 0, void 0, void 0, functi
             _id: id,
         }, newData);
         res.status(200).json({
-            status: true,
-            type: "success",
+            status: 200,
+            success: true,
             message: "User Address Deleted Successfully.",
             data: "",
         });
@@ -202,19 +185,13 @@ const activateDeactiveUserAddress = (req, res) => __awaiter(void 0, void 0, void
         }
         const address = yield userAddressModel_1.default.findById({
             _id: id,
+            user_id: user._id,
         });
         if (!address) {
             return res.status(400).json({
                 status: 400,
                 success: false,
                 message: `User Address not found.`,
-            });
-        }
-        if (address._id !== user._id) {
-            return res.status(400).json({
-                status: 400,
-                success: false,
-                message: `You are not authorise to update User Address.`,
             });
         }
         const data = {
@@ -245,7 +222,7 @@ const activateDeactiveUserAddress = (req, res) => __awaiter(void 0, void 0, void
 const GetUserAddressById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = JSON.parse(JSON.stringify(req.user));
-        const id = req.params.addressId;
+        const id = req.params.id;
         if (!id) {
             return res.status(400).json({
                 status: 400,
@@ -264,11 +241,16 @@ const GetUserAddressById = (req, res) => __awaiter(void 0, void 0, void 0, funct
                 message: `Address not forund.`,
             });
         }
-        const result = yield userAddressModel_1.default.findById({
+        const result = yield userAddressModel_1.default
+            .findById({
             _id: id,
             isdeleted: false,
             isactive: true,
-        });
+        })
+            .populate("user_id")
+            .populate("city")
+            .populate("state")
+            .populate("country");
         res.status(200).json({
             status: 200,
             success: true,
@@ -287,14 +269,16 @@ const GetUserAddressById = (req, res) => __awaiter(void 0, void 0, void 0, funct
 });
 const GetUserAddressList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // const user = JSON.parse(JSON.stringify(req.user));
+        const user = JSON.parse(JSON.stringify(req.user));
         let { page, limit, sort, cond } = req.body;
-        let search = "";
+        if (user) {
+            cond = Object.assign({ user_id: user._id, isdeleted: false }, cond);
+        }
         if (!page || page < 1) {
             page = 1;
         }
         if (!limit) {
-            limit = 9;
+            limit = 10;
         }
         if (!cond) {
             cond = {};
@@ -302,43 +286,18 @@ const GetUserAddressList = (req, res) => __awaiter(void 0, void 0, void 0, funct
         if (!sort) {
             sort = { createdAt: -1 };
         }
-        if (typeof cond.search != "undefined" && cond.search != null) {
-            search = String(cond.search);
-            delete cond.search;
-        }
-        cond = [
-            {
-                $match: {
-                    isdeleted: false,
-                    $and: [
-                        cond,
-                        {
-                            $or: [
-                                { address: { $regex: search, $options: "i" } },
-                                { city: { $regex: search, $options: "i" } },
-                            ],
-                        },
-                    ],
-                },
-            },
-            { $sort: sort },
-            {
-                $facet: {
-                    data: [{ $skip: (page - 1) * limit }, { $limit: limit }],
-                    total: [
-                        {
-                            $count: "count",
-                        },
-                    ],
-                },
-            },
-        ];
         limit = parseInt(limit);
-        const result = yield userAddressModel_1.default.aggregate(cond);
-        let totalPages = 0;
-        if (result[0].total.length != 0) {
-            totalPages = Math.ceil(result[0].total[0].count / limit);
-        }
+        const result = yield userAddressModel_1.default
+            .find(cond)
+            .populate("user_id")
+            .populate("city")
+            .populate("state")
+            .populate("country")
+            .sort(sort)
+            .skip((page - 1) * limit)
+            .limit(limit);
+        const result_count = yield userAddressModel_1.default.find(cond).count();
+        const totalPages = Math.ceil(result_count / limit);
         return res.status(200).json({
             status: 200,
             success: true,
@@ -346,8 +305,8 @@ const GetUserAddressList = (req, res) => __awaiter(void 0, void 0, void 0, funct
             page: page,
             limit: limit,
             totalPages: totalPages,
-            total: result[0].total.length != 0 ? result[0].total[0].count : 0,
-            data: result[0].data,
+            total: result_count,
+            data: result,
         });
     }
     catch (error) {
