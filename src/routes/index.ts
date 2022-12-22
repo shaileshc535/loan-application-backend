@@ -11,6 +11,12 @@ import blogRoutes from "./blogRoutes";
 import faqRoutes from "./faqRoutes";
 import locationRoutes from "./locationRoutes";
 import userAddressRoutes from "./userAddressRoutes";
+import productRoutes from "./productRoutes";
+import productCategoryRoutes from "./productCategoryRoutes";
+import productSubCategoryRoutes from "./productSubCategoryRoutes";
+import branchRoute from "./branchRoute";
+import userAccountRoutes from "./userAccountRoutes";
+import accountTypeRoutes from "./accountTypeRoutes";
 
 const Router = express.Router();
 
@@ -37,5 +43,17 @@ Router.use("/faq", faqRoutes);
 Router.use("/location", locationRoutes);
 
 Router.use("/user-address", userAddressRoutes);
+
+Router.use("/product", productRoutes);
+
+Router.use("/product-category", productCategoryRoutes);
+
+Router.use("/product-subcategory", productSubCategoryRoutes);
+
+Router.use("/branch", branchRoute);
+
+Router.use("/account", userAccountRoutes);
+
+Router.use("/account-type", accountTypeRoutes);
 
 export default Router;
