@@ -3,7 +3,7 @@ import User from "../../modal/user";
 import bcrypt from "bcryptjs";
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;
   const verifiedEmail = email.toLowerCase();
   try {
     User.findOne({
@@ -24,12 +24,65 @@ const login = async (req, res) => {
         });
       }
 
-      if (user.is_active !== true) {
+      if (user.role !== role) {
+        switch (role) {
+          case "manager":
+            return res.status(400).send({
+              type: "error",
+              status: false,
+              message: "This email is not registered in manager",
+            });
+            break;
+
+          case "employee":
+            return res.status(400).send({
+              type: "error",
+              status: false,
+              message: "This email is not registered in employee",
+            });
+            break;
+
+          case "user":
+            return res.status(400).send({
+              type: "error",
+              status: false,
+              message: "This email is not registered in user",
+            });
+            break;
+
+          case "admin":
+            return res.status(400).send({
+              type: "error",
+              status: false,
+              message: "This email is not registered as admin",
+            });
+            break;
+
+          default:
+            return res.status(400).send({
+              type: "error",
+              status: false,
+              message: "This role is not allowed in this app",
+            });
+            break;
+        }
+      }
+
+      if (user.role == "manager" && !user.is_active) {
         return res.status(400).send({
-          status: 400,
-          success: false,
+          type: "error",
+          status: false,
           message:
-            "Your Account is not Activated. Please Contact with Admin to re-activate your account.",
+            "Pending verification, Approval & activation. Someone from our management team will contact you shortly",
+        });
+      }
+
+      if (user.role == "employee" && !user.is_active) {
+        return res.status(400).send({
+          type: "error",
+          status: false,
+          message:
+            "Pending verification, Approval & activation. Someone from our management team will contact you shortly",
         });
       }
 

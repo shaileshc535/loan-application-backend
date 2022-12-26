@@ -9,7 +9,7 @@ export interface IUserAccount {
   user_address_id: PopulatedDoc<IUserAddress>;
   account_type: PopulatedDoc<IAccountType>;
   branch_id: PopulatedDoc<IBranch>;
-  account_no: number;
+  account_no: string;
   balance: number;
   transction_id: string;
   transction_amount: number;
@@ -39,7 +39,7 @@ const UserAccountSchema = new Schema<IUserAccount>(
       ref: "branch",
     },
     account_no: {
-      type: Number,
+      type: String,
       required: true,
     },
     balance: {

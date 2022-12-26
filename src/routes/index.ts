@@ -17,6 +17,7 @@ import productSubCategoryRoutes from "./productSubCategoryRoutes";
 import branchRoute from "./branchRoute";
 import userAccountRoutes from "./userAccountRoutes";
 import accountTypeRoutes from "./accountTypeRoutes";
+import transactionRoutes from "./transactionRoutes";
 
 const Router = express.Router();
 
@@ -55,5 +56,7 @@ Router.use("/branch", branchRoute);
 Router.use("/account", userAccountRoutes);
 
 Router.use("/account-type", accountTypeRoutes);
+
+Router.use("/transaction", transactionRoutes);
 
 export default Router;

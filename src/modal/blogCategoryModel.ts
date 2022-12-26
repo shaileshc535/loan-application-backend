@@ -34,6 +34,6 @@ const BlogCategorySchema = new Schema<IBlogCategory>(
   }
 );
 
-const blogCategory = model("blogCategory", BlogCategorySchema);
+const blog_category = model("blog_category", BlogCategorySchema);
 
-export default blogCategory;
+export default blog_category;

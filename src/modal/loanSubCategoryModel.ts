@@ -46,6 +46,6 @@ LoanSubCategorySchema.virtual("loanCategory", {
   foreignField: "_id",
 });
 
-const loanSubCategory = model("loanSubCategory", LoanSubCategorySchema);
+const loan_subcategory = model("loan_subcategory", LoanSubCategorySchema);
 
-export default loanSubCategory;
+export default loan_subcategory;

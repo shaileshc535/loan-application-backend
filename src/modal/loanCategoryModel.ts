@@ -34,6 +34,6 @@ const LoanCategorySchema = new Schema<ILoanCategory>(
   }
 );
 
-const loanCategory = model("loanCategory", LoanCategorySchema);
+const loan_category = model("loan_category", LoanCategorySchema);
 
-export default loanCategory;
+export default loan_category;
