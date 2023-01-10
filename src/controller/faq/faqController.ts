@@ -257,7 +257,7 @@ const findByIdFaq = async (req, res: Response) => {
       _id: faqId,
       isdeleted: false,
       isactive: true,
-    });
+    }).populate("author");
 
     if (!result) {
       return res.status(400).json({
@@ -287,72 +287,44 @@ const ListFaq = async (req, res: Response) => {
   try {
     let { page, limit, sort, cond } = req.body;
 
-    let search = "";
+    cond = {
+      isdeleted: false,
+      ...cond,
+    };
 
     if (!page || page < 1) {
       page = 1;
     }
     if (!limit) {
-      limit = 9;
+      limit = 10;
     }
     if (!cond) {
       cond = {};
     }
-
     if (!sort) {
       sort = { createdAt: -1 };
     }
-    if (typeof cond.search != "undefined" && cond.search != null) {
-      search = String(cond.search);
-      delete cond.search;
-    }
 
-    cond = [
-      {
-        $match: {
-          isdeleted: false,
-          isactive: true,
-          $and: [
-            cond,
-            {
-              $or: [
-                { title: { $regex: search, $options: "i" } },
-                { description: { $regex: search, $options: "i" } },
-              ],
-            },
-          ],
-        },
-      },
-      { $sort: sort },
-      {
-        $facet: {
-          data: [{ $skip: (page - 1) * limit }, { $limit: limit }],
-          total: [
-            {
-              $count: "count",
-            },
-          ],
-        },
-      },
-    ];
     limit = parseInt(limit);
 
-    const result = await FaqModel.aggregate(cond);
+    const result = await FaqModel.find(cond)
+      .sort(sort)
+      .skip((page - 1) * limit)
+      .limit(limit);
 
-    let totalPages = 0;
-    if (result[0].total.length != 0) {
-      totalPages = Math.ceil(result[0].total[0].count / limit);
-    }
+    const result_count = await FaqModel.find(cond).count();
+
+    const totalPages = Math.ceil(result_count / limit);
 
     return res.status(200).json({
       status: 200,
       success: true,
-      message: "Faq List Fetch Successfully",
+      message: "FAQs Fetch Successfully",
       page: page,
       limit: limit,
       totalPages: totalPages,
-      total: result[0].total.length != 0 ? result[0].total[0].count : 0,
-      data: result[0].data,
+      total: result_count,
+      data: result,
     });
   } catch (error) {
     return res.status(500).send({
