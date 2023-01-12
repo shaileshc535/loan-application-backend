@@ -255,15 +255,53 @@ const activateDeactiveBlog = async (req, res: Response) => {
   }
 };
 
+const findByBlogCategoryId = async (req, res: Response) => {
+  try {
+    const catId = req.params.catId;
+
+    const result = await blogsModel
+      .findById({
+        category: catId,
+        isdeleted: false,
+        isactive: true,
+      })
+      .populate("category");
+
+    if (!result) {
+      return res.status(400).json({
+        status: 400,
+        success: false,
+        message: "Blog not found.",
+      });
+    }
+
+    res.status(200).json({
+      status: 200,
+      success: true,
+      message: "Blog Fetch Successfully",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      status: 500,
+      success: false,
+      errors: error,
+      msg: "Something went wrong. Please try again",
+    });
+  }
+};
+
 const findByIdBlog = async (req, res: Response) => {
   try {
     const blogId = req.params.id;
 
-    const result = await blogsModel.findById({
-      _id: blogId,
-      isdeleted: false,
-      isactive: true,
-    });
+    const result = await blogsModel
+      .findById({
+        _id: blogId,
+        isdeleted: false,
+        isactive: true,
+      })
+      .populate("category");
 
     if (!result) {
       return res.status(400).json({
@@ -293,73 +331,45 @@ const ListBlog = async (req, res: Response) => {
   try {
     let { page, limit, sort, cond } = req.body;
 
-    let search = "";
+    cond = {
+      isdeleted: false,
+      ...cond,
+    };
 
     if (!page || page < 1) {
       page = 1;
     }
     if (!limit) {
-      limit = 9;
+      limit = 10;
     }
     if (!cond) {
       cond = {};
     }
-
     if (!sort) {
       sort = { createdAt: -1 };
     }
-    if (typeof cond.search != "undefined" && cond.search != null) {
-      search = String(cond.search);
-      delete cond.search;
-    }
 
-    cond = [
-      {
-        $match: {
-          isdeleted: false,
-          isactive: true,
-          $and: [
-            cond,
-            {
-              $or: [
-                { title: { $regex: search, $options: "i" } },
-                { description: { $regex: search, $options: "i" } },
-                { summary: { $regex: search, $options: "i" } },
-              ],
-            },
-          ],
-        },
-      },
-      { $sort: sort },
-      {
-        $facet: {
-          data: [{ $skip: (page - 1) * limit }, { $limit: limit }],
-          total: [
-            {
-              $count: "count",
-            },
-          ],
-        },
-      },
-    ];
     limit = parseInt(limit);
 
-    const result = await blogsModel.aggregate(cond);
+    const result = await blogsModel
+      .find(cond)
+      .sort(sort)
+      .skip((page - 1) * limit)
+      .limit(limit);
 
-    let totalPages = 0;
-    if (result[0].total.length != 0) {
-      totalPages = Math.ceil(result[0].total[0].count / limit);
-    }
+    const result_count = await blogsModel.find(cond).count();
+
+    const totalPages = Math.ceil(result_count / limit);
 
     return res.status(200).json({
       status: 200,
       success: true,
-      message: "Blog List Fetch Successfully",
+      message: "Blogs Fetch Successfully",
       page: page,
       limit: limit,
       totalPages: totalPages,
-      total: result[0].total.length != 0 ? result[0].total[0].count : 0,
-      data: result[0].data,
+      total: result_count,
+      data: result,
     });
   } catch (error) {
     return res.status(500).send({
@@ -377,5 +387,6 @@ export default {
   deleteBlog,
   activateDeactiveBlog,
   findByIdBlog,
+  findByBlogCategoryId,
   ListBlog,
 };

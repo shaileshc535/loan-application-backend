@@ -37,6 +37,8 @@ router.put("/change-activate-status", auth, controller.activateDeactiveBlog);
 
 router.get("/blog/:id", controller.findByIdBlog);
 
+router.get("/blog-by-category/:catId", controller.findByBlogCategoryId);
+
 router.post("/blogs", controller.ListBlog);
 
 export default router;
