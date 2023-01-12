@@ -23,7 +23,7 @@ const BlogSchema = new Schema<IBlog>(
     },
     category: {
       type: Schema.Types.ObjectId,
-      ref: "blogCategory",
+      ref: "blog_category",
     },
     title: {
       type: String,
@@ -56,7 +56,7 @@ const BlogSchema = new Schema<IBlog>(
 );
 
 BlogSchema.virtual("blogCategory", {
-  ref: "blogCategory",
+  ref: "blog_category",
   localField: "category",
   foreignField: "_id",
 });

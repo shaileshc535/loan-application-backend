@@ -1,5 +1,7 @@
 import { Response } from "express";
 import blogsModel from "../../modal/blogsModel";
+import mongoose from "mongoose";
+const ObjectId = <any>mongoose.Types.ObjectId;
 
 const createBlog = async (req, res: Response) => {
   try {
@@ -260,8 +262,8 @@ const findByBlogCategoryId = async (req, res: Response) => {
     const catId = req.params.catId;
 
     const result = await blogsModel
-      .findById({
-        category: catId,
+      .find({
+        category: ObjectId(catId),
         isdeleted: false,
         isactive: true,
       })
@@ -286,7 +288,7 @@ const findByBlogCategoryId = async (req, res: Response) => {
       status: 500,
       success: false,
       errors: error,
-      msg: "Something went wrong. Please try again",
+      msg: error.message,
     });
   }
 };
@@ -355,7 +357,8 @@ const ListBlog = async (req, res: Response) => {
       .find(cond)
       .sort(sort)
       .skip((page - 1) * limit)
-      .limit(limit);
+      .limit(limit)
+      .populate("category");
 
     const result_count = await blogsModel.find(cond).count();
 
