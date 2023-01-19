@@ -20,4 +20,6 @@ router.get("/loan-category/:id", controller.findByIdLoanCategory);
 
 router.post("/loan-category", controller.ListLoanCategory);
 
+router.post("/admin/loan-category", controller.ListLoanCategoryAdmin);
+
 export default router;

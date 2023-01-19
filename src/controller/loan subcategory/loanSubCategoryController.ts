@@ -260,7 +260,6 @@ const findByIdLoanSubCategory = async (req, res: Response) => {
       .findById({
         _id: subCategoryId,
         isdeleted: false,
-        isactive: true,
       })
       .populate("loan_category_id");
 
@@ -366,6 +365,83 @@ const ListLoanSubCategory = async (req, res: Response) => {
   }
 };
 
+const ListLoanSubCategoryAdmin = async (req, res: Response) => {
+  try {
+    let { page, limit, sort, cond } = req.body;
+
+    let search = "";
+
+    if (!page || page < 1) {
+      page = 1;
+    }
+    if (!limit) {
+      limit = 9;
+    }
+    if (!cond) {
+      cond = {};
+    }
+
+    if (!sort) {
+      sort = { createdAt: -1 };
+    }
+    if (typeof cond.search != "undefined" && cond.search != null) {
+      search = String(cond.search);
+      delete cond.search;
+    }
+
+    cond = [
+      {
+        $match: {
+          isdeleted: false,
+          $and: [
+            cond,
+            {
+              $or: [{ name: { $regex: search, $options: "i" } }],
+            },
+          ],
+        },
+      },
+      { $sort: sort },
+      {
+        $facet: {
+          data: [{ $skip: (page - 1) * limit }, { $limit: limit }],
+          total: [
+            {
+              $count: "count",
+            },
+          ],
+        },
+      },
+    ];
+    limit = parseInt(limit);
+
+    const result = await loanSubCategoryModel.aggregate(cond);
+
+    let totalPages = 0;
+    if (result[0].total.length != 0) {
+      totalPages = Math.ceil(result[0].total[0].count / limit);
+    }
+
+    return res.status(200).json({
+      status: 200,
+      success: true,
+      message: "Loan Sub-Category List Fetch Successfully",
+      page: page,
+      limit: limit,
+      totalPages: totalPages,
+      total: result[0].total.length != 0 ? result[0].total[0].count : 0,
+      data: result[0].data,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      status: 500,
+      success: false,
+      errors: error,
+      msg: "Something went wrong. Please try again",
+    });
+  }
+};
+
 export default {
   createLoanSubCategory,
   updateLoanSubCategory,
@@ -373,4 +449,5 @@ export default {
   activateDeactiveLoanSubCategory,
   findByIdLoanSubCategory,
   ListLoanSubCategory,
+  ListLoanSubCategoryAdmin,
 };
